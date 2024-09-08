@@ -1,1 +1,76 @@
-# Your Solution
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-catalog
+  template:
+    metadata:
+      labels:
+        app: book-catalog
+    spec:
+      containers:
+        - name: book-catalog
+          image: task72libaks.azurecr.io/book_catalog:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: '8000'
+            - name: DATABASE_URL
+              value: 'postgresql://task3db_user:TIvl0maLWmIkSItDX61dwXNn5KdGV5Ld@dpg-cregf9jv2p9s73cv1ju0-a.singapore-postgres.render.com/task3db'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-catalog
+spec:
+  selector:
+    app: book-catalog
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-management
+  template:
+    metadata:
+      labels:
+        app: inventory-management
+    spec:
+      containers:
+        - name: inventory-management
+          image: task72libaks.azurecr.io/inventory_management:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: '8001'
+            - name: DATABASE_URL
+              value: 'postgresql://task3db_user:TIvl0maLWmIkSItDX61dwXNn5KdGV5Ld@dpg-cregf9jv2p9s73cv1ju0-a.singapore-postgres.render.com/task3db'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-management
+spec:
+  selector:
+    app: inventory-management
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8001
